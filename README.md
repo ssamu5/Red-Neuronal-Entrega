@@ -1,4 +1,4 @@
-# 🧠 Detector de Spam en YouTube con Red Neuronal Superficial
+# 🧠 Detector de Spam en YouTube — Red Neuronal Superficial
 
 > **Proyecto I — Introducción a la IA**  
 > Universitat Politècnica de València · Curso 2025–2026  
@@ -8,18 +8,20 @@
 
 ## 📋 Descripción
 
-Sistema de detección de spam en comentarios de YouTube mediante una **Red Neuronal Superficial** (Shallow Neural Network). El modelo combina vectorización TF-IDF con features de ingeniería derivadas del análisis exploratorio de datos (EDA).
+Sistema de detección automática de spam en comentarios de YouTube mediante una **Red Neuronal Superficial** (Shallow Neural Network). El modelo combina vectorización **TF-IDF** con features de ingeniería derivadas del análisis exploratorio de datos (Sprint 2).
 
-### Arquitectura del modelo
+---
+
+## 🏗️ Arquitectura del modelo
 
 ```
-Entrada: TF-IDF (5 000 features) + 5 features EDA = 5 005 dimensiones
+Entrada: TF-IDF (5 000 features) + 5 features EDA (RobustScaler) = 5 005 dimensiones
          │
          ▼
-    Dense(256, ReLU) → BatchNorm → Dropout(0.30)
+    Dense(256, ReLU) → BatchNorm → Dropout(0.30)   [L2=1e-4]
          │
          ▼
-    Dense(128, ReLU) → BatchNorm → Dropout(0.20)
+    Dense(128, ReLU) → BatchNorm → Dropout(0.20)   [L2=1e-4]
          │
          ▼
        Dense(64, ReLU)
@@ -28,9 +30,13 @@ Entrada: TF-IDF (5 000 features) + 5 features EDA = 5 005 dimensiones
     Dense(1, Sigmoid) → Probabilidad de spam [0, 1]
 ```
 
-**Optimizador:** Adam (lr=0.001)  
-**Regularización:** L2 (λ=1e-4) + Dropout + EarlyStopping + ReduceLROnPlateau  
-**Loss:** Binary Crossentropy
+| Parámetro | Valor |
+|-----------|-------|
+| Optimizador | Adam (lr=0.001) |
+| Loss | Binary Crossentropy |
+| Regularización | L2 (λ=1e-4) + Dropout + EarlyStopping (paciencia=7) |
+| Preprocesado texto | EDA features → RobustScaler + TF-IDF word bigramas |
+| División | 70% train / 15% val / 15% test (estratificada) |
 
 ---
 
@@ -40,120 +46,126 @@ Entrada: TF-IDF (5 000 features) + 5 features EDA = 5 005 dimensiones
 Red-Neuronal-Entrega/
 │
 ├── 📓 notebooks/
-│   └── 01_Entrenamiento_Red_Neuronal.ipynb   ← Pipeline completo de entrenamiento
+│   └── 01_Entrenamiento_Red_Neuronal.ipynb   ← Pipeline completo Keras (Sprint 3)
 │
-├── 📓 02_Analisis_Univariante_Artur.ipynb    ← Análisis univariante (Sprint 2)
+├── 📓 02_Analisis_Univariante_Artur.ipynb    ← EDA y análisis univariante (Sprint 2)
 │
-├── 🤖 app.py                                 ← App Streamlit interactiva
+├── 🤖 app.py                                 ← App Streamlit interactiva (3 pestañas)
 │
-├── 📊 datos/
-│   ├── Youtube-Spam-Dataset.csv              ← Dataset original (1 956 comentarios)
+├── 📊 [Datos]
+│   ├── Youtube-Spam-Dataset.csv              ← 1 956 comentarios (PSY, LMFAO, Eminem,
+│   │                                            Katy Perry, Shakira)
 │   ├── Youtube-Spam-Dataset equilibrado.csv  ← Versión balanceada
 │   └── YouTube Comments Dataset (45K).csv   ← Dataset extendido (45 005 comentarios)
 │
-├── 🗂️ model/                                 ← Carpeta para el modelo entrenado
-│   ├── spam_model.keras                      ← Modelo Keras (generado tras entrenar)
+├── 🗂️ model/                                 ← Artefactos del modelo (generados al entrenar)
+│   ├── spam_model.keras                      ← Modelo Keras
 │   ├── tfidf_vectorizer.pkl                  ← Vectorizador TF-IDF
-│   └── metrics.json                          ← Métricas finales del modelo
+│   ├── eda_scaler.pkl                        ← RobustScaler EDA (necesario para inferencia)
+│   └── metrics.json                          ← Métricas finales
 │
-├── 🐳 Dockerfile                             ← Contenedor Docker
+├── 🐳 Dockerfile                             ← Docker con imagen Alpine
 ├── 📄 requirements.txt                       ← Dependencias Python
+├── 🔧 .streamlit/config.toml                 ← Configuración Streamlit
 └── 📖 README.md
 ```
 
 ---
 
-## 📊 Datasets
+## 📊 Dataset
 
-| Dataset | Filas | Spam | No Spam | Fuente |
-|---------|-------|------|---------|--------|
-| Youtube-Spam-Dataset.csv | 1 956 | ~50% | ~50% | UCI / Kaggle |
-| YouTube 45K Rows.csv | 45 005 | Variable | Variable | Kaggle |
-| **Total unificado** | **~47 000** | — | — | — |
+Los datos provienen del **UCI YouTube Spam Collection**, con comentarios reales de 5 vídeos musicales:
 
-Los datos del dataset original provienen de comentarios reales de vídeos de YouTube de artistas como **PSY, LMFAO, Eminem, Shakira y Katy Perry**, etiquetados manualmente como spam (1) o legítimos (0).
+| Artista | Comentarios |
+|---------|-------------|
+| PSY — Gangnam Style | ~350 |
+| LMFAO — Party Rock Anthem | ~350 |
+| Eminem — Love The Way You Lie | ~350 |
+| Katy Perry — Just Dance | ~350 |
+| Shakira — Waka Waka | ~350 |
+
+**Total:** 1 956 comentarios · Spam: 51.38% · No Spam: 48.62%  
+*(Balance de solo 2.76% — sin necesidad de técnicas adicionales, Sprint 2 §2.1)*
+
+---
+
+## 🔬 Features de ingeniería (Sprint 2 — EDA)
+
+| Feature | Descripción | Correlación CLASS | Decisión Sprint 2 |
+|---------|-------------|-------------------|-------------------|
+| `palabras_spam` | Palabras gancho: subscribe, free, click... | r = 0.69 | ✅ Incluida |
+| `longitud_chars` | Número de caracteres | r = 0.34 | ✅ Incluida |
+| `contiene_url` | 1 si contiene http/www/bit.ly | r = 0.33 | ✅ Incluida |
+| `ratio_mayusculas` | Proporción de mayúsculas | r = 0.10 | ✅ Incluida |
+| `log_exclamaciones` | log(1 + nº de "!") | r = 0.05 | ✅ Incluida (zero-inflated) |
+| `longitud_palabras` | Número de palabras | r = 0.91 con chars | ❌ **ELIMINADA** (§4.2) |
+
+**Escalado:** `RobustScaler` (mediana+IQR) — justificado por distribuciones asimétricas (skewness: 3.14, 2.95, 37.36, Sprint 2 §4.1).
+
+---
+
+## 🐛 Bugs corregidos respecto al documento original
+
+| # | Sección | Problema | Solución |
+|---|---------|----------|----------|
+| 1 | Sprint 2 §5.5 | `scaler.fit_transform(df[...])` sobre **todo** el dataset → **data leakage** | `fit()` solo en train; `transform()` en val/test |
+| 2 | Sprint 2 §4.2 | `longitud_palabras` incluida a pesar de r=0.91 con `longitud_chars` | Eliminada del vector de features |
+| 3 | Sprint 2 §4.1 | `RobustScaler` mencionado pero no implementado en el pipeline | Implementado y guardado como `eda_scaler.pkl` |
+| 4 | Sprint 1 | Columna `Artista` referenciada pero no existe en los CSV | Creada automáticamente al concatenar |
 
 ---
 
 ## ⚙️ Instalación y uso
 
-### Opción A — Ejecución directa (recomendado para probar)
+### Opción A — Ejecución directa
 
 ```bash
-# 1. Clonar el repositorio
-git clone https://github.com/Angel247-coder/Red-Neuronal-Entrega.git
+git clone https://github.com/ssamu5/Red-Neuronal-Entrega.git
 cd Red-Neuronal-Entrega
-
-# 2. Instalar dependencias
 pip install -r requirements.txt
-
-# 3. Lanzar la app Streamlit
 python -m streamlit run app.py
 ```
 
-La app se abrirá en `http://localhost:8501` y entrenará la red neuronal automáticamente la primera vez.
+La app abre en `http://localhost:8501` y entrena automáticamente la primera vez (~2 min).
 
----
-
-### Opción B — Entrenar el modelo completo (Keras + GPU)
+### Opción B — Notebook completo (Keras + GPU)
 
 ```bash
-# 1. Instalar dependencias adicionales
-pip install tensorflow
-
-# 2. Abrir el notebook de entrenamiento
 jupyter notebook notebooks/01_Entrenamiento_Red_Neuronal.ipynb
 ```
 
-O en **Google Colab** (gratis, con GPU):
+[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/ssamu5/Red-Neuronal-Entrega/blob/main/notebooks/01_Entrenamiento_Red_Neuronal.ipynb)
 
-[![Abrir en Colab](https://colab.research.google.com/assets/colab-badge.svg)](https://colab.research.google.com/github/Angel247-coder/Red-Neuronal-Entrega/blob/main/notebooks/01_Entrenamiento_Red_Neuronal.ipynb)
-
----
-
-### Opción C — Docker
+### Opción C — Docker (Alpine)
 
 ```bash
 docker build -t spam-detector .
 docker run -p 8501:8501 spam-detector
 ```
 
+> Imagen basada en `python:3.10-alpine` — ligera y segura.
+
 ---
 
 ## 🖥️ App Streamlit
 
-La aplicación interactiva incluye **3 pestañas**:
-
 | Pestaña | Descripción |
 |---------|-------------|
-| 🔍 **Analizar Comentario** | Introduce un comentario y obtén la probabilidad de spam con un medidor visual |
-| 📊 **Análisis Batch** | Sube un CSV y clasifica todos los comentarios a la vez |
-| 📈 **Métricas del Modelo** | Visualiza accuracy, F1, AUC-ROC, curvas de entrenamiento y matriz de confusión |
-
----
-
-## 🔬 Features de ingeniería (Sprint 2 — EDA)
-
-| Feature | Descripción |
-|---------|-------------|
-| `longitud_chars` | Número de caracteres del comentario |
-| `ratio_mayusculas` | Proporción de letras en mayúsculas |
-| `contiene_url` | 1 si contiene enlace (http, www, bit.ly...) |
-| `log_exclamaciones` | log(1 + nº de signos !) |
-| `palabras_spam` | 1 si contiene palabras típicas de spam (subscribe, free, click...) |
+| 🔍 **Analizar Comentario** | Texto libre → probabilidad de spam con medidor visual |
+| 📊 **Análisis Batch** | Sube CSV → clasifica todos los comentarios |
+| 📈 **Métricas del Modelo** | Accuracy, F1, AUC-ROC, matriz de confusión, curva ROC |
 
 ---
 
 ## 🛡️ Medidas anti-overfitting
 
-Con un dataset relativamente pequeño, se aplicaron múltiples capas de regularización:
-
-1. **Arquitectura mínima** — 3 capas ocultas (256 → 128 → 64)
-2. **Regularización L2** (λ = 1e-4) en cada capa densa
+1. **Arquitectura mínima** — 3 capas (256 → 128 → 64)
+2. **Regularización L2** (λ = 1e-4) en capas densas
 3. **Dropout** (0.30 y 0.20) entre capas ocultas
-4. **EarlyStopping** sobre `val_loss` (paciencia=7)
-5. **ReduceLROnPlateau** para ajuste fino del learning rate
-6. **División estratificada** 70% train / 15% val / 15% test
+4. **EarlyStopping** sobre `val_loss` (paciencia = 7)
+5. **ReduceLROnPlateau** — lr ÷ 2 si no mejora en 3 épocas
+6. **ModelCheckpoint** — guarda solo el mejor según `val_auc`
+7. **División estratificada** 70% / 15% / 15%
 
 ---
 
@@ -169,31 +181,30 @@ Con un dataset relativamente pequeño, se aplicaron múltiples capas de regulari
 
 ---
 
-## 🧱 Tecnologías utilizadas
+## 🧱 Tecnologías
 
-![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python)
-![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange?logo=tensorflow)
-![Streamlit](https://img.shields.io/badge/Streamlit-1.32-red?logo=streamlit)
-![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3-F7931E?logo=scikit-learn)
-![Pandas](https://img.shields.io/badge/Pandas-2.0-150458?logo=pandas)
-![Docker](https://img.shields.io/badge/Docker-ready-2496ED?logo=docker)
+![Python](https://img.shields.io/badge/Python-3.10-blue?logo=python&logoColor=white)
+![TensorFlow](https://img.shields.io/badge/TensorFlow-2.x-orange?logo=tensorflow&logoColor=white)
+![Streamlit](https://img.shields.io/badge/Streamlit-1.32+-red?logo=streamlit&logoColor=white)
+![scikit-learn](https://img.shields.io/badge/scikit--learn-1.3+-F7931E?logo=scikit-learn&logoColor=white)
+![Docker](https://img.shields.io/badge/Docker-Alpine-2496ED?logo=docker&logoColor=white)
 
 ---
 
-## 👥 Autores
+## 👥 Equipo
 
-| Nombre | Rol |
-|--------|-----|
-| Ángel del Campo | Arquitectura red neuronal, entrenamiento, app Streamlit |
-| Samuel Litago | Integración pipeline, Docker, deployment |
-| Artur Mas | Análisis exploratorio (EDA), análisis univariante |
-| Pablo | Preprocesamiento de datos, ingeniería de features |
+| Nombre | Contribución |
+|--------|-------------|
+| **Ángel del Campo** | Arquitectura red neuronal, entrenamiento Keras, EDA multivariante |
+| **Samuel Litago** | Ingeniería de features, pipeline de datos, Docker, deployment |
+| **Artur Mas** | Análisis univariante (Sprint 2), detección de outliers, notebook EDA |
+| **Pablo** | Planificación (PERT/Gantt), preprocesamiento, tratamiento de ausentes |
 
 ---
 
 ## 📚 Referencias
 
-- [UCI YouTube Spam Collection Dataset](https://archive.ics.uci.edu/ml/datasets/YouTube+Spam+Collection)
-- [Kaggle — YouTube Comments 45K](https://www.kaggle.com/)
 - Alberto, T. C., Lochter J. V., Almeida T. A. *TubeSpam: Comment Spam Filtering on YouTube*. ICMLA, 2015.
+- [UCI YouTube Spam Collection](https://archive.ics.uci.edu/ml/datasets/YouTube+Spam+Collection)
 - Goodfellow, I. et al. *Deep Learning*. MIT Press, 2016.
+- Pedregosa, F. et al. *Scikit-learn: Machine Learning in Python*. JMLR, 2011.

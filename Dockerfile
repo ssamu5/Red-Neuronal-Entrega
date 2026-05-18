@@ -1,20 +1,25 @@
-# ── Imagen base ligera ────────────────────────────────────────────────────────
-FROM python:3.10-slim
+# ── Imagen base Alpine (ligera y segura) ──────────────────────────────────────
+FROM python:3.10-alpine
 
 # Metadatos
 LABEL maintainer="Proyecto IA UPV"
 LABEL description="YouTube Spam Detector — Red Neuronal Superficial"
+LABEL version="1.0"
 
 # Variables de entorno
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
     PIP_NO_CACHE_DIR=1
 
-# ── Dependencias del sistema ──────────────────────────────────────────────────
-RUN apt-get update && apt-get install -y --no-install-recommends \
-      build-essential \
+# ── Dependencias del sistema (Alpine usa apk, no apt) ─────────────────────────
+RUN apk add --no-cache \
+      gcc \
+      g++ \
+      musl-dev \
+      linux-headers \
       curl \
-    && rm -rf /var/lib/apt/lists/*
+      libffi-dev \
+      openssl-dev
 
 # ── Directorio de trabajo ─────────────────────────────────────────────────────
 WORKDIR /app
@@ -24,12 +29,15 @@ COPY requirements.txt .
 RUN pip install --upgrade pip && \
     pip install -r requirements.txt
 
-# ── Código fuente y datos ─────────────────────────────────────────────────────
-COPY app.py           .
-COPY *.csv            ./
-COPY model/           ./model/
+# ── Código fuente ─────────────────────────────────────────────────────────────
+COPY app.py .
+COPY .streamlit/ ./.streamlit/
 
-# Crear directorio model si no existe (para montaje de volumen)
+# ── Datos ─────────────────────────────────────────────────────────────────────
+COPY Youtube-Spam-Dataset.csv .
+COPY Youtube-Spam-Dataset\ equilibrado.csv.csv .
+
+# Crear directorio model (para montar modelo entrenado)
 RUN mkdir -p model
 
 # ── Puerto Streamlit ──────────────────────────────────────────────────────────
