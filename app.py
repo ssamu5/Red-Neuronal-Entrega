@@ -1,7 +1,7 @@
-﻿"""
-YouTube Spam Detector â€” Red Neuronal para DetecciÃ³n de Spam
-Proyecto I: IntroducciÃ³n a la IA
-Universitat PolitÃ¨cnica de ValÃ¨ncia
+"""
+YouTube Spam Detector - Red Neuronal para Deteccion de Spam
+Proyecto I: Introduccion a la IA
+Universitat Politecnica de Valencia
 
 Modelo: Red Neuronal Superficial (MLP) con TF-IDF + Feature Engineering
 Dataset: YouTube Comments (5 artistas: PSY, Katy Perry, LMFAO, Eminem, Shakira)
@@ -22,15 +22,14 @@ import joblib
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.neural_network import MLPClassifier
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import RobustScaler
 from sklearn.metrics import (
     accuracy_score, precision_score, recall_score, f1_score,
     confusion_matrix, classification_report, roc_auc_score, roc_curve,
 )
 
-# ══════════════════════════════════════════════════════════════════════════════
-# CONFIGURACIÓN DE PÁGINA
-# ══════════════════════════════════════════════════════════════════════════════
+# ============================================================
+# CONFIGURACION DE PAGINA
+# ============================================================
 st.set_page_config(
     page_title="YouTube Spam Detector IA",
     page_icon="🛡️",
@@ -38,9 +37,9 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
-# CSS â€” TEMA OSCURO CON NEON
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
+# CSS -- TEMA OSCURO CON NEON
+# ============================================================
 st.markdown("""
 <style>
 :root {
@@ -51,7 +50,7 @@ st.markdown("""
   --border: rgba(0,212,255,0.18);
 }
 
-/* ── Fondo ─────────────────────────────────────────────────────────────── */
+/* Fondo */
 .stApp, .stApp > header {
   background: linear-gradient(135deg,var(--bg0) 0%,var(--bg1) 50%,var(--bg0) 100%) !important;
 }
@@ -60,7 +59,7 @@ section[data-testid="stSidebar"] {
   border-right: 1px solid var(--border) !important;
 }
 
-/* ── Hero ───────────────────────────────────────────────────────────────── */
+/* Hero */
 .hero {
   background: linear-gradient(135deg,#0f0f23,#1a0a2e,#0a1628);
   border: 1px solid var(--border); border-radius: 24px;
@@ -87,7 +86,7 @@ section[data-testid="stSidebar"] {
   margin-top:1rem; text-transform:uppercase;
 }
 
-/* ── Cards ──────────────────────────────────────────────────────────────── */
+/* Cards */
 .card {
   background:rgba(26,26,53,0.7); border:1px solid var(--border);
   border-radius:16px; padding:1.5rem; backdrop-filter:blur(8px);
@@ -95,7 +94,7 @@ section[data-testid="stSidebar"] {
 }
 .card:hover { border-color:rgba(0,212,255,0.4); transform:translateY(-1px); }
 
-/* ── Veredicto ──────────────────────────────────────────────────────────── */
+/* Veredicto */
 .verdict {
   text-align:center; padding:2rem 1rem 1.5rem;
   border-radius:20px; margin:1rem 0;
@@ -117,7 +116,7 @@ section[data-testid="stSidebar"] {
 .verdict.safe .verdict-label { color:var(--green); }
 .verdict-prob { font-size:1rem; color:var(--txt2); display:block; }
 
-/* ── Feature pills ──────────────────────────────────────────────────────── */
+/* Feature pills */
 .pills { display:flex; flex-wrap:wrap; gap:0.4rem; margin-top:0.6rem; }
 .pill {
   display:inline-block; padding:0.3rem 0.85rem;
@@ -126,7 +125,7 @@ section[data-testid="stSidebar"] {
 .pill-on  { background:rgba(255,68,85,0.15);   border:1px solid var(--red);             color:var(--red);   }
 .pill-off { background:rgba(148,163,184,0.07); border:1px solid rgba(148,163,184,0.2); color:var(--txt2); }
 
-/* ── Sidebar stats ──────────────────────────────────────────────────────── */
+/* Sidebar stats */
 .stat-box {
   background:rgba(26,26,53,0.5); border:1px solid var(--border);
   border-radius:12px; padding:1rem 1.2rem; margin-bottom:0.6rem; text-align:center;
@@ -134,7 +133,7 @@ section[data-testid="stSidebar"] {
 .stat-val { font-size:1.5rem; font-weight:800; color:var(--cyan); }
 .stat-lbl { font-size:0.75rem; color:var(--txt2); text-transform:uppercase; letter-spacing:0.05em; }
 
-/* ── Overrides Streamlit ────────────────────────────────────────────────── */
+/* Overrides Streamlit */
 .stTextArea textarea {
   background:rgba(26,26,53,0.9) !important; border:1px solid rgba(0,212,255,0.3) !important;
   color:var(--txt) !important; border-radius:12px !important; font-size:0.95rem !important;
@@ -174,9 +173,9 @@ hr       { border-color:var(--border) !important; }
 """, unsafe_allow_html=True)
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 # CONSTANTES Y HELPERS
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 SPAM_WORDS = re.compile(
     r'subscribe|suscrib|check.?out|my.?channel|free|gratis|click|win|gana|'
     r'giveaway|sorteo|crypto|bitcoin|investment|earn|profit|dm.?me|'
@@ -186,13 +185,13 @@ SPAM_WORDS = re.compile(
 
 EJEMPLOS_SPAM = [
     "Subscribe to my channel NOW! FREE music + giveaway: http://bit.ly/freemusic",
-    "WIN $1000 FREE! Click here and subscribe â†’ www.spam.com/win",
+    "WIN $1000 FREE! Click here and subscribe to win big money!!!",
     "Check out my channel!! 1000 subs giveaway! Subscribe NOW!!!!!",
     "earn money fast click here dm me for info crypto investment profit guaranteed",
 ]
 EJEMPLOS_REAL = [
     "This is one of my favorite songs of all time. Pure nostalgia.",
-    "The guitar solo at 2:47 gives me chills every single time I listen to this.",
+    "The guitar solo at 2:47 gives me chills every single time.",
     "I showed this song to my dad and now he loves it too!",
     "Honestly this takes me back to 2012, what a time to be alive.",
 ]
@@ -201,7 +200,7 @@ MODEL_DIR = "model"
 
 
 def engineer_features(texts) -> np.ndarray:
-    """5 features numéricas derivadas del EDA (Sprint 2)."""
+    """5 features numericas derivadas del EDA (Sprint 2)."""
     s = pd.Series(list(texts)).astype(str)
     n_chars  = s.str.len().fillna(0).values.astype(np.float32)
     ratio_up = (s.str.count(r"[A-Z]") / pd.Series(n_chars).clip(lower=1)).fillna(0).values.astype(np.float32)
@@ -215,22 +214,22 @@ def features_activadas(text: str):
     s = str(text)
     n_chars = len(s)
     return [
-        ("🔗 Contiene URL",          bool(re.search(r"https?://|www\.|bit\.ly", s, re.I)), "Enlace externo detectado"),
-        ("📣 Palabras clave spam",   bool(SPAM_WORDS.search(s)),                           "Términos típicos de spam"),
-        ("📏 Comentario muy largo",  n_chars > 150,                                         "Más de 150 caracteres"),
-        ("🔠 Exceso de mayúsculas",  (len(re.findall(r"[A-Z]", s)) / max(n_chars, 1)) > 0.25, "Ratio mayúsculas > 25%"),
-        ("❗ Muchas exclamaciones",  s.count("!") > 2,                                     "Más de 2 signos !"),
+        ("Contiene URL",          bool(re.search(r"https?://|www\.|bit\.ly", s, re.I)), "Enlace externo detectado"),
+        ("Palabras clave spam",   bool(SPAM_WORDS.search(s)),                           "Terminos tipicos de spam"),
+        ("Comentario muy largo",  n_chars > 150,                                         "Mas de 150 caracteres"),
+        ("Exceso de mayusculas",  (len(re.findall(r"[A-Z]", s)) / max(n_chars, 1)) > 0.25, "Ratio mayusculas > 25%"),
+        ("Muchas exclamaciones",  s.count("!") > 2,                                     "Mas de 2 signos !"),
     ]
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 # CARGA DE DATOS
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 @st.cache_data(show_spinner=False)
 def load_data() -> pd.DataFrame:
     path = "Youtube-Spam-Dataset.csv"
     if not os.path.exists(path):
-        st.error("❌ No se encontró 'Youtube-Spam-Dataset.csv'. Ejecuta la app desde la carpeta raíz del proyecto.")
+        st.error("No se encontro 'Youtube-Spam-Dataset.csv'. Ejecuta la app desde la carpeta raiz del proyecto.")
         st.stop()
     df = pd.read_csv(path)
     df = df[["CONTENT", "CLASS"]].rename(columns={"CONTENT": "text", "CLASS": "label"})
@@ -239,16 +238,16 @@ def load_data() -> pd.DataFrame:
     return df[df["text"].str.len() > 2].reset_index(drop=True)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
-# MODELO — carga pre-entrenado o entrena y guarda
-# ══════════════════════════════════════════════════════════════════════════════
+# ============================================================
+# MODELO -- carga pre-entrenado o entrena y guarda
+# ============================================================
 @st.cache_resource(show_spinner=False)
 def load_or_train_model():
     model_path   = os.path.join(MODEL_DIR, "spam_model.pkl")
     tfidf_path   = os.path.join(MODEL_DIR, "tfidf_vectorizer.pkl")
     metrics_path = os.path.join(MODEL_DIR, "metrics.json")
 
-    # ── Intentar cargar modelo guardado ──────────────────────────────────────
+    # Intentar cargar modelo guardado
     if os.path.exists(model_path) and os.path.exists(tfidf_path):
         try:
             mlp   = joblib.load(model_path)
@@ -259,9 +258,9 @@ def load_or_train_model():
                     metrics = json.load(f)
             return mlp, tfidf, metrics
         except Exception:
-            pass  # Si falla la carga, entrenar de nuevo
+            pass
 
-    # ── Entrenar modelo ───────────────────────────────────────────────────────
+    # Entrenar modelo
     df = load_data()
 
     X_tr, X_te, y_tr, y_te = train_test_split(
@@ -309,15 +308,12 @@ def load_or_train_model():
         "f1":        float(f1_score(y_te, y_pred, zero_division=0)),
         "auc_roc":   float(roc_auc_score(y_te, y_prob)),
         "model_type": "MLP Clasificador (Red Neuronal Superficial)",
-        "architecture": "5005 → 256 → 128 → 64 → 1",
-        "tfidf_features": 5000,
-        "eng_features": 5,
+        "architecture": "5005 -> 256 -> 128 -> 64 -> 1",
         "y_test": y_te.tolist(),
         "y_pred": y_pred.tolist(),
         "y_prob": y_prob.tolist(),
     }
 
-    # ── Guardar artefactos ────────────────────────────────────────────────────
     os.makedirs(MODEL_DIR, exist_ok=True)
     joblib.dump(mlp,   model_path)
     joblib.dump(tfidf, tfidf_path)
@@ -340,9 +336,9 @@ def predict_batch(texts, model, tfidf) -> np.ndarray:
     return model.predict_proba(np.hstack([Xt, Xe]))[:, 1]
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 # COMPONENTES VISUALES
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 def gauge_chart(prob: float) -> go.Figure:
     color = "#ff4455" if prob >= 0.5 else "#00ff88"
     fig = go.Figure(go.Indicator(
@@ -407,7 +403,7 @@ def confusion_heatmap(cm: np.ndarray) -> go.Figure:
         paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(0,0,0,0)",
         font={"color": "#94a3b8", "size": 13}, height=300,
         margin=dict(l=10, r=10, t=30, b=10),
-        xaxis={"title": "Predicción", "titlefont": {"color": "#94a3b8"}},
+        xaxis={"title": "Prediccion", "titlefont": {"color": "#94a3b8"}},
         yaxis={"title": "Real",       "titlefont": {"color": "#94a3b8"}},
     )
     return fig
@@ -437,18 +433,18 @@ def roc_chart(y_test, y_prob, auc: float) -> go.Figure:
     return fig
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 # SIDEBAR
-# ══════════════════════════════════════════════════════════════════════════════
+# ============================================================
 def render_sidebar(metrics: dict, df: pd.DataFrame):
     with st.sidebar:
-        st.markdown("### 🛡️ Spam Detector IA")
+        st.markdown("### Spam Detector IA")
         st.markdown("---")
 
         st.markdown("""
         <div class="stat-box">
           <div class="stat-lbl">Arquitectura</div>
-          <div class="stat-val" style="font-size:0.95rem">256 → 128 → 64 → 1</div>
+          <div class="stat-val" style="font-size:0.95rem">256 -> 128 -> 64 -> 1</div>
         </div>
         <div class="stat-box">
           <div class="stat-lbl">Features de entrada</div>
@@ -486,65 +482,64 @@ def render_sidebar(metrics: dict, df: pd.DataFrame):
         st.markdown("""
         <div style="font-size:0.75rem;color:#64748b;line-height:1.7;">
         <b style="color:#94a3b8">Dataset de entrenamiento:</b><br>
-        • PSY · Katy Perry · LMFAO<br>
-        • Eminem · Shakira<br>
-        • 1 956 comentarios reales<br><br>
-        <b style="color:#94a3b8">UPV — Proyecto I: Intro IA</b><br>
-        Ángel · Samuel · Artur · Pablo
+        PSY - Katy Perry - LMFAO<br>
+        Eminem - Shakira<br>
+        1 956 comentarios reales<br><br>
+        <b style="color:#94a3b8">UPV -- Proyecto I: Intro IA</b><br>
+        Angel - Samuel - Artur - Pablo
         </div>
         """, unsafe_allow_html=True)
 
 
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 # MAIN
-# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# ============================================================
 def main():
-    with st.spinner("📊 Cargando dataset de YouTube..."):
+    with st.spinner("Cargando dataset de YouTube..."):
         df = load_data()
 
-    with st.spinner("🧠 Inicializando red neuronal... (solo la primera vez)"):
+    with st.spinner("Inicializando red neuronal... (solo la primera vez tarda ~1 min)"):
         model, tfidf, metrics = load_or_train_model()
 
     render_sidebar(metrics, df)
 
-    # ── Hero ─────────────────────────────────────────────────────────────────
+    # Hero
     st.markdown("""
     <div class="hero">
       <h1 class="hero-title">YouTube Spam Detector</h1>
-      <p class="hero-sub">Red Neuronal Superficial · TF-IDF + Feature Engineering · Clasificación Automática</p>
-      <span class="hero-badge">🎓 Proyecto IA · UPV · 2026</span>
+      <p class="hero-sub">Red Neuronal Superficial &middot; TF-IDF + Feature Engineering &middot; Clasificacion Automatica</p>
+      <span class="hero-badge">Proyecto IA &middot; UPV &middot; 2026</span>
     </div>
     """, unsafe_allow_html=True)
 
-    # ── Tabs ─────────────────────────────────────────────────────────────────
+    # Tabs
     tab1, tab2, tab3 = st.tabs([
-        "ðŸ”  Analizar Comentario",
-        "ðŸ“Š  AnÃ¡lisis Masivo (CSV)",
-        "ðŸ“ˆ  Rendimiento del Modelo",
+        "🔍  Analizar Comentario",
+        "📊  Analisis Masivo (CSV)",
+        "📈  Rendimiento del Modelo",
     ])
 
-    # ════════════════════════════════════════════════════════════════════════
-    # TAB 1 — ANÁLISIS INDIVIDUAL
-    # ════════════════════════════════════════════════════════════════════════
+    # ==================================================================
+    # TAB 1 -- ANALISIS INDIVIDUAL
+    # ==================================================================
     with tab1:
         col_in, col_out = st.columns([1, 1], gap="large")
 
         with col_in:
             st.markdown("#### ✍️ Introduce un comentario")
 
-            # Manejo de ejemplos rápidos con session_state
             if "texto_demo" not in st.session_state:
                 st.session_state.texto_demo = ""
 
             comentario = st.text_area(
                 label="",
                 value=st.session_state.texto_demo,
-                placeholder="Escribe o pega aquí un comentario de YouTube...",
+                placeholder="Escribe o pega aqui un comentario de YouTube...",
                 height=160,
                 key="texto_input",
             )
 
-            st.markdown("<p style='font-size:0.82rem;margin-bottom:0.3rem;color:#94a3b8'>Ejemplos rápidos:</p>",
+            st.markdown("<p style='font-size:0.82rem;margin-bottom:0.3rem;color:#94a3b8'>Ejemplos rapidos:</p>",
                         unsafe_allow_html=True)
             c1, c2 = st.columns(2)
             with c1:
@@ -556,7 +551,7 @@ def main():
                     st.session_state.texto_demo = np.random.choice(EJEMPLOS_REAL)
                     st.rerun()
 
-            analizar = st.button("ðŸ” Analizar Comentario", use_container_width=True)
+            analizar = st.button("🔍 Analizar Comentario", use_container_width=True)
 
         with col_out:
             texto_a_analizar = comentario.strip()
@@ -591,19 +586,18 @@ def main():
                 )
                 st.markdown(f'<div class="pills">{pills}</div>', unsafe_allow_html=True)
 
-                # Tooltip descripción
                 if n_act > 0:
                     activos_desc = " · ".join(f[2] for f in feats if f[1])
                     st.markdown(f"""
                     <div class="card" style="margin-top:1rem;padding:1rem;">
                       <span style="color:#94a3b8;font-size:0.82rem;">
-                      <b style="color:#ff4455">Señales detectadas:</b> {activos_desc}
+                      <b style="color:#ff4455">Senales detectadas:</b> {activos_desc}
                       </span>
                     </div>
                     """, unsafe_allow_html=True)
 
             elif analizar:
-                st.warning("âš ï¸ Por favor, introduce un comentario antes de analizar.")
+                st.warning("Por favor, introduce un comentario antes de analizar.")
             else:
                 st.markdown("""
                 <div class="card" style="text-align:center;padding:3rem 1rem;">
@@ -613,16 +607,16 @@ def main():
                 </div>
                 """, unsafe_allow_html=True)
 
-    # ════════════════════════════════════════════════════════════════════════
-    # TAB 2 — ANÁLISIS MASIVO
-    # ════════════════════════════════════════════════════════════════════════
+    # ==================================================================
+    # TAB 2 -- ANALISIS MASIVO
+    # ==================================================================
     with tab2:
-        st.markdown("#### ðŸ“¤ Sube un archivo CSV para anÃ¡lisis masivo")
+        st.markdown("#### 📤 Sube un archivo CSV para analisis masivo")
         st.markdown("""
         <div class="card">
           <p>El CSV debe contener una columna llamada <code>CONTENT</code>, <code>comment_text</code>
           o <code>text</code> con los comentarios a analizar.<br>
-          La columna <code>CLASS</code> es opcional — si existe, se muestra para comparar con las predicciones.</p>
+          La columna <code>CLASS</code> es opcional -- si existe, se muestra junto a las predicciones.</p>
         </div>
         """, unsafe_allow_html=True)
 
@@ -636,11 +630,11 @@ def main():
                     None,
                 )
                 if col_txt is None:
-                    st.error("âŒ No se encontrÃ³ una columna 'CONTENT', 'comment_text' o 'text'.")
+                    st.error("No se encontro una columna 'CONTENT', 'comment_text' o 'text'.")
                 else:
                     df_up["text"] = df_up[col_txt].astype(str).str.strip()
                     df_up = df_up[df_up["text"].str.len() > 2].reset_index(drop=True)
-                    st.info(f"📋 **{len(df_up):,} comentarios cargados.** Procesando con la red neuronal...")
+                    st.info(f"**{len(df_up):,} comentarios cargados.** Procesando con la red neuronal...")
 
                     barra = st.progress(0, text="Analizando...")
                     probs, BATCH = [], 256
@@ -666,7 +660,7 @@ def main():
                     c_pie, c_hist = st.columns(2)
                     with c_pie:
                         fig_pie = go.Figure(go.Pie(
-                            labels=["ðŸš¨ SPAM", "âœ… No Spam"],
+                            labels=["🚨 SPAM", "✅ No Spam"],
                             values=[n_spam, n_real],
                             marker_colors=["#ff4455", "#00ff88"],
                             hole=0.5,
@@ -676,7 +670,7 @@ def main():
                             paper_bgcolor="rgba(0,0,0,0)", height=250,
                             margin=dict(l=10, r=10, t=30, b=10),
                             legend={"font": {"color": "#94a3b8"}},
-                            title={"text": "Distribución SPAM / No Spam",
+                            title={"text": "Distribucion SPAM / No Spam",
                                    "font": {"color": "white", "size": 13}},
                         )
                         st.plotly_chart(fig_pie, use_container_width=True,
@@ -690,7 +684,7 @@ def main():
                         fig_h.update_layout(
                             paper_bgcolor="rgba(0,0,0,0)", plot_bgcolor="rgba(30,32,64,0.4)",
                             height=250, margin=dict(l=10, r=10, t=30, b=10),
-                            title={"text": "Distribución de probabilidades",
+                            title={"text": "Distribucion de probabilidades",
                                    "font": {"color": "white", "size": 13}},
                             font={"color": "#94a3b8"},
                             xaxis={"title": "P(spam)", "gridcolor": "rgba(255,255,255,0.05)"},
@@ -708,7 +702,7 @@ def main():
 
                     st.dataframe(
                         df_up[cols_show].rename(columns={
-                            "text": "Comentario", "spam_prob": "P(spam)", "prediccion": "Predicción"
+                            "text": "Comentario", "spam_prob": "P(spam)", "prediccion": "Prediccion"
                         }),
                         use_container_width=True, height=320,
                     )
@@ -718,16 +712,16 @@ def main():
                                        "resultados_spam.csv", "text/csv", use_container_width=True)
 
             except Exception as e:
-                st.error(f"âŒ Error al procesar el archivo: {e}")
+                st.error(f"Error al procesar el archivo: {e}")
 
-    # ════════════════════════════════════════════════════════════════════════
-    # TAB 3 — MÉTRICAS
-    # ════════════════════════════════════════════════════════════════════════
+    # ==================================================================
+    # TAB 3 -- METRICAS
+    # ==================================================================
     with tab3:
-        st.markdown("#### 📈 Rendimiento en el conjunto de test (20% datos)")
+        st.markdown("#### 📈 Rendimiento en el conjunto de test (20% de los datos)")
 
         if not metrics:
-            st.info("ℹ️ Métricas no disponibles todavía.")
+            st.info("Metricas no disponibles todavia.")
         else:
             acc  = metrics.get("accuracy",  0)
             prec = metrics.get("precision", 0)
@@ -755,7 +749,7 @@ def main():
                 y_pr = np.array(y_prob_lst)
 
                 with c_cm:
-                    st.markdown("**Matriz de Confusión**")
+                    st.markdown("**Matriz de Confusion**")
                     cm = confusion_matrix(y_ta, y_pa)
                     st.plotly_chart(confusion_heatmap(cm), use_container_width=True,
                                     config={"displayModeBar": False})
@@ -772,7 +766,7 @@ def main():
                                     config={"displayModeBar": False})
 
                 st.markdown("---")
-                st.markdown("**Informe completo de clasificación**")
+                st.markdown("**Informe completo de clasificacion**")
                 report = classification_report(y_ta, y_pa,
                                                target_names=["No Spam", "Spam"],
                                                output_dict=True)
@@ -786,11 +780,11 @@ def main():
             st.markdown("""
             <div class="card">
               <b style="color:#00d4ff">Red Neuronal Superficial (MLP)</b><br><br>
-              <code style="color:#a855f7">Input → 5 005 features</code><br>&emsp;↓<br>
-              <code style="color:#00d4ff">Dense(256, ReLU) — capa 1</code><br>&emsp;↓<br>
-              <code style="color:#00d4ff">Dense(128, ReLU) — capa 2</code><br>&emsp;↓<br>
-              <code style="color:#00d4ff">Dense(64,  ReLU) — capa 3</code><br>&emsp;↓<br>
-              <code style="color:#00ff88">Dense(1, Sigmoid) — salida</code>
+              <code style="color:#a855f7">Input -> 5 005 features</code><br>&emsp;&darr;<br>
+              <code style="color:#00d4ff">Dense(256, ReLU) -- capa 1</code><br>&emsp;&darr;<br>
+              <code style="color:#00d4ff">Dense(128, ReLU) -- capa 2</code><br>&emsp;&darr;<br>
+              <code style="color:#00d4ff">Dense(64,  ReLU) -- capa 3</code><br>&emsp;&darr;<br>
+              <code style="color:#00ff88">Dense(1, Sigmoid) -- salida</code>
             </div>
             """, unsafe_allow_html=True)
 
@@ -798,24 +792,23 @@ def main():
             st.markdown("""
             <div class="card">
               <b style="color:#00d4ff">Features de Entrada (5 005 dim.)</b><br><br>
-              <span style="color:#e2e8f0">• TF-IDF bigramas</span>
-              <span style="color:#a855f7"> → 5 000 features</span><br>
-              <span style="color:#e2e8f0">• Longitud en caracteres</span>
-              <span style="color:#a855f7"> → 1 feature</span><br>
-              <span style="color:#e2e8f0">• Ratio de mayúsculas</span>
-              <span style="color:#a855f7"> → 1 feature</span><br>
-              <span style="color:#e2e8f0">• Presencia de URL</span>
-              <span style="color:#a855f7"> → 1 feature</span><br>
-              <span style="color:#e2e8f0">• log(exclamaciones + 1)</span>
-              <span style="color:#a855f7"> → 1 feature</span><br>
-              <span style="color:#e2e8f0">• Palabras clave spam</span>
-              <span style="color:#a855f7"> → 1 feature</span><br><br>
-              <b>Regularización:</b>
-              <span style="color:#94a3b8">L2 (α=1e-4) + Early Stopping</span>
+              <span style="color:#e2e8f0">TF-IDF bigramas</span>
+              <span style="color:#a855f7"> &rarr; 5 000 features</span><br>
+              <span style="color:#e2e8f0">Longitud en caracteres</span>
+              <span style="color:#a855f7"> &rarr; 1 feature</span><br>
+              <span style="color:#e2e8f0">Ratio de mayusculas</span>
+              <span style="color:#a855f7"> &rarr; 1 feature</span><br>
+              <span style="color:#e2e8f0">Presencia de URL</span>
+              <span style="color:#a855f7"> &rarr; 1 feature</span><br>
+              <span style="color:#e2e8f0">log(exclamaciones + 1)</span>
+              <span style="color:#a855f7"> &rarr; 1 feature</span><br>
+              <span style="color:#e2e8f0">Palabras clave spam</span>
+              <span style="color:#a855f7"> &rarr; 1 feature</span><br><br>
+              <b>Regularizacion:</b>
+              <span style="color:#94a3b8">L2 (a=1e-4) + Early Stopping</span>
             </div>
             """, unsafe_allow_html=True)
 
 
 if __name__ == "__main__":
     main()
-
