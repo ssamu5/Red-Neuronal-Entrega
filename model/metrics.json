@@ -1,0 +1,10 @@
+{
+  "accuracy": 0.9455782312925171,
+  "precision": 0.9591836734693877,
+  "recall": 0.9337748344370861,
+  "f1": 0.9463087248322147,
+  "auc_roc": 0.9842078451349975,
+  "model_type": "MLPClassifier - Red Neuronal Superficial",
+  "architecture": "5005 -> 256 -> 128 -> 64 -> 1",
+  "n_iter": 22
+}
