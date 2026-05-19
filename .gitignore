@@ -2,44 +2,34 @@
 __pycache__/
 *.py[cod]
 *.pyo
-*.pyd
 .Python
-env/
-venv/
-.venv/
 *.egg-info/
 dist/
 build/
+*.egg
+
+# Entornos virtuales
+venv/
+env/
+.env
+.venv
 
 # Jupyter
 .ipynb_checkpoints/
 *.ipynb_checkpoints
 
-# Modelos entrenados (son grandes, se generan ejecutando el notebook)
-model/*.keras
-model/*.h5
-model/*.pkl
-model/metrics.json
+# Streamlit
+.streamlit/secrets.toml
 
-# Imágenes generadas por el notebook
+# Archivos temporales
+*.tmp
+*.log
 curvas_entrenamiento.png
 matriz_confusion_roc.png
 
-# Variables de entorno
-.env
-.env.local
+# Modelos grandes (el modelo entrenado SÍ se sube, pero no formatos Keras pesados)
+*.h5
 
-# IDEs
-.vscode/
-.idea/
-*.swp
-*.swo
-
-# Sistema operativo
+# OS
 .DS_Store
 Thumbs.db
-desktop.ini
-
-# Logs
-*.log
-logs/
