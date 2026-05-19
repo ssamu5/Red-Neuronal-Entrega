@@ -1,7 +1,7 @@
-"""
-YouTube Spam Detector — Red Neuronal para Detección de Spam
-Proyecto I: Introducción a la IA
-Universitat Politècnica de València
+﻿"""
+YouTube Spam Detector â€” Red Neuronal para DetecciÃ³n de Spam
+Proyecto I: IntroducciÃ³n a la IA
+Universitat PolitÃ¨cnica de ValÃ¨ncia
 
 Modelo: Red Neuronal Superficial (MLP) con TF-IDF + Feature Engineering
 Dataset: YouTube Comments (5 artistas: PSY, Katy Perry, LMFAO, Eminem, Shakira)
@@ -38,9 +38,9 @@ st.set_page_config(
     initial_sidebar_state="expanded",
 )
 
-# ══════════════════════════════════════════════════════════════════════════════
-# CSS — TEMA OSCURO CON NEON
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
+# CSS â€” TEMA OSCURO CON NEON
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 st.markdown("""
 <style>
 :root {
@@ -174,9 +174,9 @@ hr       { border-color:var(--border) !important; }
 """, unsafe_allow_html=True)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # CONSTANTES Y HELPERS
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 SPAM_WORDS = re.compile(
     r'subscribe|suscrib|check.?out|my.?channel|free|gratis|click|win|gana|'
     r'giveaway|sorteo|crypto|bitcoin|investment|earn|profit|dm.?me|'
@@ -186,7 +186,7 @@ SPAM_WORDS = re.compile(
 
 EJEMPLOS_SPAM = [
     "Subscribe to my channel NOW! FREE music + giveaway: http://bit.ly/freemusic",
-    "WIN $1000 FREE! Click here and subscribe → www.spam.com/win",
+    "WIN $1000 FREE! Click here and subscribe â†’ www.spam.com/win",
     "Check out my channel!! 1000 subs giveaway! Subscribe NOW!!!!!",
     "earn money fast click here dm me for info crypto investment profit guaranteed",
 ]
@@ -223,9 +223,9 @@ def features_activadas(text: str):
     ]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # CARGA DE DATOS
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 @st.cache_data(show_spinner=False)
 def load_data() -> pd.DataFrame:
     path = "Youtube-Spam-Dataset.csv"
@@ -340,9 +340,9 @@ def predict_batch(texts, model, tfidf) -> np.ndarray:
     return model.predict_proba(np.hstack([Xt, Xe]))[:, 1]
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # COMPONENTES VISUALES
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 def gauge_chart(prob: float) -> go.Figure:
     color = "#ff4455" if prob >= 0.5 else "#00ff88"
     fig = go.Figure(go.Indicator(
@@ -437,7 +437,7 @@ def roc_chart(y_test, y_prob, auc: float) -> go.Figure:
     return fig
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # SIDEBAR
 # ══════════════════════════════════════════════════════════════════════════════
 def render_sidebar(metrics: dict, df: pd.DataFrame):
@@ -495,9 +495,9 @@ def render_sidebar(metrics: dict, df: pd.DataFrame):
         """, unsafe_allow_html=True)
 
 
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 # MAIN
-# ══════════════════════════════════════════════════════════════════════════════
+# â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•â•
 def main():
     with st.spinner("📊 Cargando dataset de YouTube..."):
         df = load_data()
@@ -518,9 +518,9 @@ def main():
 
     # ── Tabs ─────────────────────────────────────────────────────────────────
     tab1, tab2, tab3 = st.tabs([
-        "🔍  Analizar Comentario",
-        "📊  Análisis Masivo (CSV)",
-        "📈  Rendimiento del Modelo",
+        "ðŸ”  Analizar Comentario",
+        "ðŸ“Š  AnÃ¡lisis Masivo (CSV)",
+        "ðŸ“ˆ  Rendimiento del Modelo",
     ])
 
     # ════════════════════════════════════════════════════════════════════════
@@ -556,7 +556,7 @@ def main():
                     st.session_state.texto_demo = np.random.choice(EJEMPLOS_REAL)
                     st.rerun()
 
-            analizar = st.button("🔍 Analizar Comentario", use_container_width=True)
+            analizar = st.button("ðŸ” Analizar Comentario", use_container_width=True)
 
         with col_out:
             texto_a_analizar = comentario.strip()
@@ -603,7 +603,7 @@ def main():
                     """, unsafe_allow_html=True)
 
             elif analizar:
-                st.warning("⚠️ Por favor, introduce un comentario antes de analizar.")
+                st.warning("âš ï¸ Por favor, introduce un comentario antes de analizar.")
             else:
                 st.markdown("""
                 <div class="card" style="text-align:center;padding:3rem 1rem;">
@@ -617,7 +617,7 @@ def main():
     # TAB 2 — ANÁLISIS MASIVO
     # ════════════════════════════════════════════════════════════════════════
     with tab2:
-        st.markdown("#### 📤 Sube un archivo CSV para análisis masivo")
+        st.markdown("#### ðŸ“¤ Sube un archivo CSV para anÃ¡lisis masivo")
         st.markdown("""
         <div class="card">
           <p>El CSV debe contener una columna llamada <code>CONTENT</code>, <code>comment_text</code>
@@ -636,7 +636,7 @@ def main():
                     None,
                 )
                 if col_txt is None:
-                    st.error("❌ No se encontró una columna 'CONTENT', 'comment_text' o 'text'.")
+                    st.error("âŒ No se encontrÃ³ una columna 'CONTENT', 'comment_text' o 'text'.")
                 else:
                     df_up["text"] = df_up[col_txt].astype(str).str.strip()
                     df_up = df_up[df_up["text"].str.len() > 2].reset_index(drop=True)
@@ -666,7 +666,7 @@ def main():
                     c_pie, c_hist = st.columns(2)
                     with c_pie:
                         fig_pie = go.Figure(go.Pie(
-                            labels=["🚨 SPAM", "✅ No Spam"],
+                            labels=["ðŸš¨ SPAM", "âœ… No Spam"],
                             values=[n_spam, n_real],
                             marker_colors=["#ff4455", "#00ff88"],
                             hole=0.5,
@@ -718,7 +718,7 @@ def main():
                                        "resultados_spam.csv", "text/csv", use_container_width=True)
 
             except Exception as e:
-                st.error(f"❌ Error al procesar el archivo: {e}")
+                st.error(f"âŒ Error al procesar el archivo: {e}")
 
     # ════════════════════════════════════════════════════════════════════════
     # TAB 3 — MÉTRICAS
@@ -818,3 +818,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
